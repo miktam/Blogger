@@ -2,33 +2,26 @@ var express = require('express');
 var redis = require('redis');
 var db = redis.createClient();
 var app = express();
+var provider = require('./routes/routes');
 
-app.get('/blog/post/:id', function(req, res) {
-	
-	res.send( 
-			{
-				id:	req.params.id,
-				title:	'First post for get',
-				body:	'Not much as the body of the blog post'
-			});
+var app = express();
+module.exports = app;
+
+app.configure(function() {
+	app.use(express.bodyParser());
+	app.use(express.methodOverride());
 });
 
-app.get('/blog/posts', function(req, res) {
-		
-	res.send( 
-		[ 
-			{ 
-				title:	'First post', 
-				body:	'This post is kind of short one'
-			},
-			{
-				title:	'Second post',
-				body:	'Not much longer in second one...'
-			}
-		]);
-});
+app.get('/blog/post/:id', provider.findBlogById);
+
+app.get('/blog/posts', provider.findAllPosts);
+
+app.post('/blog/post/create', provider.createBlogPost);
+
+app.put('/blog/post/:id', provider.updateBlogPost);
+
+app.delete('/blog/post/:id', provider.deleteBlogPost);
 
 app.listen(3000);
 
 console.log('Blog API started on localhost:3000');
-
