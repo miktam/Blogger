@@ -99,13 +99,12 @@ describe('show a post', function() {
 
 var blogPostTitleToUpdate = 'new title';
 var blogPostMessageToUpdate = 'new simple message body';
-var blogPostIdToUpdate = 10;
 
 describe('update a blog post', function() {
 	it('should return updated blog post', function(done) {
 		request({
 			method: 'PUT',
-			url: url + '/blog/post/' + blogPostIdToUpdate,
+			url: url + '/blog/post/' + blogPostTitleToCreate,
 			json: true,
 			body: {
 				title: blogPostTitleToUpdate,
@@ -122,6 +121,27 @@ describe('update a blog post', function() {
 				assert.equal(body.title, blogPostTitleToUpdate, 'returned title shall be the same as submitted')
 				assert.equal(body.message, blogPostMessageToUpdate, 'returned message shall be the same as submitted')
 				done()
+			}
+		})
+	})
+})
+
+describe('update a non existing blog post', function() {
+	it('should return error', function(done) {
+		request({
+			method: 'PUT',
+			url: url + '/blog/post/' + 'non existing entry',
+			json: true,
+			body: {
+				title: blogPostTitleToUpdate,
+				message: blogPostMessageToUpdate
+			}
+		}, function(err, res, body) {
+			if(err) {
+				res.statusCode.should.be.equal(410)
+				done()
+			} else {				
+				done(err)
 			}
 		})
 	})
