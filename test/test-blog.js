@@ -70,9 +70,9 @@ describe('delete a post', function(){
 });
 
 describe('show a post', function(){
-	describe('GET /blog/:id', function(){
-		it("GET /blog/:id should show a post", function(done){
-			request('http://127.0.0.1:3000/blog/:id/', function(err,resp,body){
+	describe('GET /blog/post/:id', function(){
+		it("GET /blog/post/:id should show a post", function(done){
+			request('http://127.0.0.1:3000/blog/post/:id', function(err,resp,body) {
 				assert.equal(resp.statusCode, 200);
 				var obj = JSON.parse(body);
 				obj.should.be.a('object');

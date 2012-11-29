@@ -3,27 +3,32 @@ var redis = require('redis');
 var db = redis.createClient();
 var app = express();
 
-app.use(function(req, res, next){
-  var ua = req.headers['user-agent'];
-  db.zadd('online', Date.now(), ua, next);
+app.get('/blog/post/:id', function(req, res) {
+	console.log('get post');
+	res.send( 
+			{
+				id:	req.params.id,
+				title:	'First post for get',
+				body:	'Not much as the body of the blog post'
+			});
 });
 
-app.use(function(req, res, next){
-  var min = 60 * 1000;
-  var ago = Date.now() - min;
-  db.zrevrangebyscore('online', '+inf', ago, function(err, users){
-    if (err) return next(err);
-    req.online = users;
-    next();
-  });
-});
-
-app.get('/', function(req, res){
-  console.log("request came");
-  res.send(req.online.length + ' users online');
+app.get('/blog/posts', function(req, res) {
+	console.log('use dummy data first');	
+	res.send( 
+		[ 
+			{ 
+				title:	'First post', 
+				body:	'This post is kind of short one'
+			},
+			{
+				title:	'Second post',
+				body:	'Not much longer in second one...'
+			}
+		]);
 });
 
 app.listen(3000);
 
-console.log('started online counter');
+console.log('Blog API started on localhost:3000');
 
