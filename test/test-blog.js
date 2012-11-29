@@ -96,7 +96,6 @@ describe('show a post', function() {
 
 
 
-
 var blogPostTitleToUpdate = 'new title';
 var blogPostMessageToUpdate = 'new simple message body';
 
@@ -140,46 +139,42 @@ describe('update a non existing blog post', function() {
 			if(err) {
 				res.statusCode.should.be.equal(410)
 				done()
-			} else {				
+			} else {
 				done(err)
 			}
 		})
 	})
 })
 
-var blogPostIdToDelete = 30;
 describe('delete a blog post', function() {
 	it('should return 200', function(done) {
 		request({
 			method: 'DELETE',
-			url: url + '/blog/post/' + blogPostIdToDelete,
+			url: url + '/blog/post/' + blogPostTitleSecondToCreate,
 		}, function(err, res, body) {
 			if(err) {
 				done(err)
 			} else {
-				res.statusCode.should.be.equal(200)				
+				res.statusCode.should.be.equal(200)
 				done()
 			}
 		})
 	})
 })
 
-/*
-uses supertest 
-var requestS = require('supertest');
-var server = require('../app');
-
-describe('POST /blog/create', function() {
-		it('responds with success', function(done) {
-			requestS(server)
-				.post('/blog/post/create')
-				.send({title: 'my title', message: 'simple message body'})
-				.end(function(err, res) {
-					assert.equal(err, null);
-					var body = res.body;
-					assert.equal(body.result, 'success');
-					done();
-				});
-		});
-	});
-*/
+var blogPostIdToDeleteDoesNotExist = 30;
+describe('delete a non-existing blog post', function() {
+	it('should return 410', function(done) {
+		request({
+			method: 'DELETE',
+			url: url + '/blog/post/' + blogPostIdToDeleteDoesNotExist,
+		}, function(err, res, body) {
+			if(err) {
+				res.statusCode.should.be.equal(410)
+				done()
+			} else {
+				done(err)
+			}
+		})
+	})
+})

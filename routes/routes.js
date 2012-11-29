@@ -63,7 +63,7 @@ exports.findBlogById = function(req, res) {
  * @param post.title new title to insert
  * @param post.message new message to insert
  * @return updated message if found
- *			410 otherwise
+ *		   410 otherwise
  */
 exports.updateBlogPost = function(req, res) {
 
@@ -95,8 +95,23 @@ exports.updateBlogPost = function(req, res) {
 
 };
 
+/**
+ * Delete blog post
+ * @param get.id it of post to delete
+ * @return 200 if post was deleted
+ *		   410 otherwise
+ */
 exports.deleteBlogPost = function(req, res) {
-	res.send({
-		id: req.params.id
+
+	var id = req.params.id.replace(" ", "-")
+
+	client.hget(postSchema, id, function(err, result) {
+		if(result != undefined) {
+			client.hdel(postSchema, id)
+			res.send(200);
+
+		} else {
+			res.send(410)
+		}
 	});
 };
