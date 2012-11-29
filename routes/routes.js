@@ -2,6 +2,7 @@ var redis = require('redis');
 var client = redis.createClient();
 
 var postSchema = "storage:posts"
+var commentSchema = "storage:comments"
 
 /**
  * Store post with title as a key in hash (replace " " to "-" first)
@@ -24,27 +25,26 @@ exports.createBlogPost = function(req, res) {
 			title: title,
 			message: message
 		});
-	}
-
-	/**
-	 * Get all posts
-	 * Query for all keys first, then extract values, and populate res with extracted data
-	 */
-	exports.findAllPosts = function(req, res) {
-
-		var posts = []
-		client.hgetall(postSchema, function(err, keys) {
-			for(var k in keys) {
-				var value = keys[k];
-				var entry = JSON.parse(value);
-				posts.push({
-					title: entry.title,
-					message: entry.message
-				})
-			}
-			res.send(posts)
-		});
 	};
+
+/**
+ * Get all posts
+ * Query for all keys first, then extract values, and populate res with extracted data
+ */
+exports.findAllPosts = function(req, res) {
+	var posts = []
+	client.hgetall(postSchema, function(err, keys) {
+		for(var k in keys) {
+			var value = keys[k];
+			var entry = JSON.parse(value);
+			posts.push({
+				title: entry.title,
+				message: entry.message
+			})
+		}
+		res.send(posts)
+	});
+};
 
 
 exports.findBlogById = function(req, res) {
@@ -59,6 +59,7 @@ exports.findBlogById = function(req, res) {
 
 /**
  * Update blog post
+ *
  * @param get.id it of post to update
  * @param post.title new title to insert
  * @param post.message new message to insert
@@ -92,14 +93,14 @@ exports.updateBlogPost = function(req, res) {
 			res.send(410)
 		}
 	});
-
 };
 
 /**
  * Delete blog post
+ *
  * @param get.id it of post to delete
  * @return 200 if post was deleted
- *		   410 otherwise
+ *		   410 post not found
  */
 exports.deleteBlogPost = function(req, res) {
 
@@ -115,3 +116,41 @@ exports.deleteBlogPost = function(req, res) {
 		}
 	});
 };
+
+/**
+ * Create comment for post
+ * Comments are stored in SET, key for the set equals title of the post
+ * If author and comment body already exist for given post, they don't be duplicated as it is SET
+ *
+ * @param get.id post title to add comment to
+ * @param post.author	author of the comment
+ * @param post.comment 	comment body
+ * @return 	added comment if post exists
+ *			410 otherwise
+ */
+exports.createCommentForPost = function(req, res) {
+
+	var author = req.param('author')
+	var comment = req.param('comment')
+
+	var commentToStore = {
+		author: author,
+		comment: comment
+	}
+
+	var idOfPost = req.params.id.replace(" ", "-")
+
+	// check if post exist, if not, skip inserting
+	client.hget(postSchema, idOfPost, function(err, result) {
+		if(result != undefined) {
+			client.sadd(idOfPost, JSON.stringify(commentToStore))
+			res.send({
+				author: author,
+				comment: comment
+			});
+
+		} else {
+			res.send(410)
+		}
+	});
+}

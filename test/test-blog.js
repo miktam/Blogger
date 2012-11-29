@@ -137,10 +137,10 @@ describe('update a non existing blog post', function() {
 			}
 		}, function(err, res, body) {
 			if(err) {
+				done(err)
+			} else {
 				res.statusCode.should.be.equal(410)
 				done()
-			} else {
-				done(err)
 			}
 		})
 	})
@@ -170,10 +170,60 @@ describe('delete a non-existing blog post', function() {
 			url: url + '/blog/post/' + blogPostIdToDeleteDoesNotExist,
 		}, function(err, res, body) {
 			if(err) {
+				done(err)
+			} else {
 				res.statusCode.should.be.equal(410)
 				done()
-			} else {
+			}
+		})
+	})
+})
+
+var commentAuthor = 'Andrei'
+var commentBody = 'Will it scale?'
+
+describe('create a comment for a blog post', function() {
+	it('should return created comment', function(done) {
+		request({
+			method: 'POST',
+			url: url + '/blog/comment/create/' + blogPostTitleToCreate,
+			json: true,
+			body: {
+				author: commentAuthor,
+				comment: commentBody
+			}
+		}, function(err, res, body) {
+			if(err) {
 				done(err)
+			} else {
+				res.statusCode.should.be.equal(200)
+				body.should.be.a('object')
+				body.should.have.property('author')
+				body.should.have.property('comment')
+				assert.equal(body.author, commentAuthor, 'returned author shall be the same as submitted')
+				assert.equal(body.comment, commentBody, 'returned message shall be the same as submitted')
+				done()
+			}
+		})
+	})
+})
+
+describe('create a comment for a non existing blog post', function() {
+	it('should return 410', function(done) {
+		request({
+			method: 'POST',
+			url: url + '/blog/comment/create/' + 'non existing post',
+			json: true,
+			body: {
+				author: commentAuthor,
+				comment: commentBody
+			}
+		}, function(err, res, body) {
+			if(err) {
+				done(err)
+			} else {
+				res.statusCode.should.be.equal(410)
+				done()
 			}
 		})
 	})
