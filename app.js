@@ -4,7 +4,7 @@ var db = redis.createClient();
 var app = express();
 
 app.get('/blog/post/:id', function(req, res) {
-	console.log('get post');
+	
 	res.send( 
 			{
 				id:	req.params.id,
@@ -14,7 +14,7 @@ app.get('/blog/post/:id', function(req, res) {
 });
 
 app.get('/blog/posts', function(req, res) {
-	console.log('use dummy data first');	
+		
 	res.send( 
 		[ 
 			{ 

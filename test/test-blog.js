@@ -4,18 +4,6 @@ var should = require('should');
 var request = require('request');
 var assert = require('assert');
 
-describe('test if server is running', function(){
-	describe('GET /', function(){
-		it("should respond with status 200", function(done){
-			request('http://127.0.0.1:3000/', function(err,resp,body){
-				assert.equal(resp.statusCode, 200);
-				done(); 
-				}); 
-			}); 
-		});
-
-});
-
 describe('list all posts', function(){
 	describe('GET /blog/posts', function(){
 		it("GET /blog/posts should respond with list of blog posts", function(done){
@@ -23,9 +11,34 @@ describe('list all posts', function(){
 				assert.equal(resp.statusCode, 200);
 				should.exist(body);
 				var posts = JSON.parse(body);
-				posts.should.be.a('array');
 
+				console.log("result of GET /posts\n" + JSON.stringify(posts, null, 2));
+
+				assert.equal(2, posts.length, "len shall be 2");
 				
+				var firstPost = posts[0];
+				assert.equal(firstPost.title, "First post", "title does not match");
+				assert.equal(firstPost.body, "This post is kind of short one", "body does not match");
+				
+				done(); 
+				}); 
+			}); 
+		});
+
+});
+
+describe('show a post', function(){
+	describe('GET /blog/post/:id', function(){
+		it("GET /blog/post/:id should show a post", function(done){
+			request('http://127.0.0.1:3000/blog/post/:id', function(err,resp,body) {
+				assert.equal(resp.statusCode, 200);
+				var obj = JSON.parse(body);
+				
+				console.log("result of GET post/:id\n" + JSON.stringify(obj, null, 2));
+
+				obj.should.be.a('object');
+				obj.should.have.property('title');
+				obj.should.have.property('body');
 				done(); 
 				}); 
 			}); 
@@ -69,18 +82,4 @@ describe('delete a post', function(){
 
 });
 
-describe('show a post', function(){
-	describe('GET /blog/post/:id', function(){
-		it("GET /blog/post/:id should show a post", function(done){
-			request('http://127.0.0.1:3000/blog/post/:id', function(err,resp,body) {
-				assert.equal(resp.statusCode, 200);
-				var obj = JSON.parse(body);
-				obj.should.be.a('object');
-				obj.should.have.property('title');
-				obj.should.have.property('body');
-				done(); 
-				}); 
-			}); 
-		});
 
-});
