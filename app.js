@@ -1,15 +1,10 @@
 var express = require('express');
-var redis = require('redis');
-var db = redis.createClient();
 var app = express();
 var provider = require('./routes/routes');
-
-var app = express();
 module.exports = app;
 
 app.configure(function() {
 	app.use(express.bodyParser())
-	app.use(express.methodOverride())
 });
 
 app.get('/blog/post/:id', provider.findBlogById)
@@ -19,7 +14,7 @@ app.put('/blog/post/:id', provider.updateBlogPost)
 app.delete('/blog/post/:id', provider.deleteBlogPost)
 
 app.post('/blog/comment/create/:id', provider.createCommentForPost)
-app.delete('/blog/comment/:id', provider.deleteComment)
+app.delete('/blog/comment/:id', provider.deleteCommentForPost)
 
 app.listen(3000)
 

@@ -228,3 +228,45 @@ describe('create a comment for a non existing blog post', function() {
 		})
 	})
 })
+
+describe('delete a comment for a blog post', function() {
+	it('should return 200', function(done) {
+		request({
+			method: 'DELETE',
+			url: url + '/blog/comment/' + blogPostTitleToCreate,
+			json: true,
+			body: {
+				author: commentAuthor,
+				comment: commentBody
+			}
+		}, function(err, res, body) {
+			if(err) {
+				done(err)
+			} else {
+				res.statusCode.should.be.equal(200)
+				done()
+			}
+		})
+	})
+})
+
+describe('delete a comment for a non existing post', function() {
+	it('should return 200', function(done) {
+		request({
+			method: 'DELETE',
+			url: url + '/blog/comment/' + 'non existing',
+			json: true,
+			body: {
+				author: commentAuthor,
+				comment: commentBody
+			}
+		}, function(err, res, body) {
+			if(err) {
+				done(err)
+			} else {
+				res.statusCode.should.be.equal(410)
+				done()
+			}
+		})
+	})
+})

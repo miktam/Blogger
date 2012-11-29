@@ -2,7 +2,6 @@ var redis = require('redis');
 var client = redis.createClient();
 
 var postSchema = "storage:posts"
-var commentSchema = "storage:comments"
 
 /**
  * Store post with title as a key in hash (replace " " to "-" first)
@@ -149,6 +148,40 @@ exports.createCommentForPost = function(req, res) {
 				comment: comment
 			});
 
+		} else {
+			res.send(410)
+		}
+	});
+}
+
+/**
+ * Delete comment for given post
+ * Comment is deleted when author and comment body matches
+ * If post does not exist, skip deleting
+ *
+ * @param get.id post title to delete comment from
+ * @param post.author	author of the comment to delete
+ * @param post.comment 	comment body to delete
+ * @return 	added comment if post exists
+ *			410 otherwise
+ */
+exports.deleteCommentForPost = function(req, res) {
+
+	var author = req.param('author')
+	var comment = req.param('comment')
+
+	var commentToDelete = {
+		author: author,
+		comment: comment
+	}
+
+	var idOfPost = req.params.id.replace(" ", "-")
+
+	// check if post exist, if not, skip deleting
+	client.hget(postSchema, idOfPost, function(err, result) {
+		if(result != undefined) {
+			client.srem(idOfPost, JSON.stringify(commentToDelete))
+			res.send(200);
 		} else {
 			res.send(410)
 		}
