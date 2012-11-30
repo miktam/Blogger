@@ -75,7 +75,6 @@ exports.findBlogById = function(req, res) {
 				if(result != undefined) {
 					var comments = JSON.parse(comments);
 				} // else there is no comments for this post
-
 				res.send({
 					post: post,
 					comments: comments
@@ -214,6 +213,58 @@ exports.deleteCommentForPost = function(req, res) {
 		if(result != undefined) {
 			client.srem(idOfPost, JSON.stringify(commentToDelete))
 			res.send(200);
+		} else {
+			res.send(410)
+		}
+	});
+}
+
+/**
+ * Create threaded comment (comment a comment)
+ * Current implementaion assumes that there is only one comment for post exist 
+ * 
+ * @param get.id 	 	id of post where look for comment to thread
+ * @param get.commented comment which shall be commented
+ * @param post.author 	author of nested comment
+ * @param post.commen 	body of nested comment
+ * @return combined		object with root (rott comment) and actual nested comment if post/comment exist
+ *						410 otherwise
+ */
+exports.createCommentForComment = function(req, res) {
+
+	var author = req.param('author')
+	var comment = req.param('comment')
+
+	var commentToStore = {
+		author: author,
+		comment: comment
+	}
+
+	var idOfPost = req.params.id.replace(" ", "-")
+	var idOfComment = req.params.comment
+
+	// check if post exist, if not, skip inserting
+	client.hget(postSchema, idOfPost, function(err, result) {
+		if(result != undefined) {
+
+			// check if there is connected comments for that
+			client.smembers(idOfPost, function(err, comments) {
+
+				if(result != undefined) {
+					var json = JSON.parse(comments);
+					json = JSON.stringify(json);
+
+					if(json == idOfComment) {
+						client.sadd(idOfComment, JSON.stringify(commentToStore))
+						res.send({
+							root: idOfComment,
+							comment: JSON.stringify(commentToStore)
+						})
+					}
+				} // else there is no comments for this post or comment not found
+				res.send(410)
+			});
+
 		} else {
 			res.send(410)
 		}

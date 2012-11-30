@@ -38,7 +38,7 @@ describe('create a blog post', function() {
 })
 
 var commentAuthor = 'Andrei'
-var commentBody = 'Will it scale?'
+var commentBody = 'Simple comment'
 
 describe('create a comment for a blog post', function() {
 	it('should return created comment', function(done) {
@@ -60,6 +60,60 @@ describe('create a comment for a blog post', function() {
 				body.should.have.property('comment')
 				assert.equal(body.author, commentAuthor, 'returned author shall be the same as submitted')
 				assert.equal(body.comment, commentBody, 'returned message shall be the same as submitted')
+				done()
+			}
+		})
+	})
+})
+
+var rootComment = {
+	author: commentAuthor,
+	comment: commentBody,
+}
+
+var nestedComment = {
+	author: 'another author of comment to comment',
+	comment: 'another commentBody'
+}
+
+describe('create a comment for a comment', function() {
+	it('should return root and nested comment', function(done) {
+		request({
+			method: 'POST',
+			url: url + '/blog/comment/comment/' + blogPostTitleToCreate + '/' + JSON.stringify(rootComment),
+			json: true,
+			body: nestedComment
+		}, function(err, res, body) {
+			if(err) {
+				done(err)
+			} else {
+				res.statusCode.should.be.equal(200)
+				body.should.have.property('root')
+				body.should.have.property('comment')
+				assert.equal(body.root, JSON.stringify(rootComment), 'root element shall be equal to root comment (commented one by submitted comment)')
+				done()
+			}
+		})
+	})
+})
+
+var notExistingRootComment = {
+	author: 'not existing',
+	comment: 'not existing',
+}
+
+describe('create a comment for non existing comment', function() {
+	it('should return 410', function(done) {
+		request({
+			method: 'POST',
+			url: url + '/blog/comment/comment/' + blogPostTitleToCreate + '/' + JSON.stringify(notExistingRootComment),
+			json: true,
+			body: nestedComment
+		}, function(err, res, body) {
+			if(err) {
+				done(err)
+			} else {
+				res.statusCode.should.be.equal(410)
 				done()
 			}
 		})

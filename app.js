@@ -16,6 +16,8 @@ app.delete('/blog/post/:id', provider.deleteBlogPost)
 app.post('/blog/comment/create/:id', provider.createCommentForPost)
 app.delete('/blog/comment/:id', provider.deleteCommentForPost)
 
+app.post('/blog/comment/comment/:id/:comment', provider.createCommentForComment)
+
 app.listen(3000)
 
 console.log('Blog API started on localhost:3000')
