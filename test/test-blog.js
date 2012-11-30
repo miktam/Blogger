@@ -11,6 +11,27 @@ var blogPostMessageToCreate = 'simple message body';
 var blogPostTitleSecondToCreate = 'my second title';
 var blogPostMessageSecondToCreate = 'second simple message body';
 
+var commentAuthor = 'Andrei'
+var commentBody = 'Simple comment'
+
+var rootComment = {
+	author: commentAuthor,
+	comment: commentBody,
+}
+
+var nestedComment = {
+	author: 'another author of comment to comment',
+	comment: 'another commentBody'
+}
+
+var notExistingRootComment = {
+	author: 'not existing',
+	comment: 'not existing',
+}
+
+var blogPostTitleToUpdate = 'new title'
+var blogPostMessageToUpdate = 'new simple message body'
+
 describe('create a blog post', function() {
 	it('should return created blog post', function(done) {
 		request({
@@ -36,9 +57,6 @@ describe('create a blog post', function() {
 		})
 	})
 })
-
-var commentAuthor = 'Andrei'
-var commentBody = 'Simple comment'
 
 describe('create a comment for a blog post', function() {
 	it('should return created comment', function(done) {
@@ -66,16 +84,6 @@ describe('create a comment for a blog post', function() {
 	})
 })
 
-var rootComment = {
-	author: commentAuthor,
-	comment: commentBody,
-}
-
-var nestedComment = {
-	author: 'another author of comment to comment',
-	comment: 'another commentBody'
-}
-
 describe('create a comment for a comment', function() {
 	it('should return root and nested comment', function(done) {
 		request({
@@ -96,11 +104,6 @@ describe('create a comment for a comment', function() {
 		})
 	})
 })
-
-var notExistingRootComment = {
-	author: 'not existing',
-	comment: 'not existing',
-}
 
 describe('create a comment for non existing comment', function() {
 	it('should return 410', function(done) {
@@ -174,11 +177,6 @@ describe('show a post', function() {
 	});
 
 });
-
-
-
-var blogPostTitleToUpdate = 'new title'
-var blogPostMessageToUpdate = 'new simple message body'
 
 describe('update a blog post', function() {
 	it('should return updated blog post', function(done) {
